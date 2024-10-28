@@ -1,0 +1,22 @@
+In your code, the Python threading library is used to perform concurrent operations.
+This can increase the efficiency of your program when you have tasks that can be done independently of each other,
+such as logging in different users and performing certain tests. Here's how multithreading works in your code:
+
+The function run_tests_for_user is designed to perform all the operations for a single user: logging them in,
+getting their access token, and running all the tests for that user.
+The run_tests function is where the threading happens.
+It starts by preparing some shared resources: the CSV writer and the access tokens for all the users.
+It also creates an empty list, threads, to keep track of all the threads it will create.
+Then it opens the file of user credentials and starts reading it row by row.
+Each row contains the credentials for one user.
+For each user, it creates a new thread using threading.Thread.
+The target of this thread — the function that will be run in the new thread — is run_tests_for_user, and the arguments are the row of credentials and the CSV writer.
+It starts the new thread with t.start(), adds it to the threads list, and then waits for a certain amount of time before continuing to the next row.
+The effect of this is that all the users' tests are started in rapid succession, but not exactly at the same time.
+There is a delay of Between_threads seconds between each one.
+Once all the threads are started, the main thread — the one running run_tests — waits for all of them to finish using thread.
+join(). This ensures that it doesn't proceed to the next step until all the tests are completed.
+After all the threads have finished, it goes through all the web driver instances and closes them.
+This way, the tests for all users are run in parallel, but with a controlled delay between each user's tests.
+ This can be a lot faster than running them one at a time, and it can simulate the kind of load that a real system might experience with multiple users.
+ It also makes sure that all the tests are completed before the program finishes

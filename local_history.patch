@@ -1,0 +1,89 @@
+Index: Get_Clarian7W.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/Get_Clarian7W.py b/Get_Clarian7W.py
+--- a/Get_Clarian7W.py	
++++ b/Get_Clarian7W.py	(date 1705582541525)
+@@ -226,14 +226,37 @@
+ 
+ class Summarize:
+     def close_firefox_processes(self):
+-        if os.name == 'nt':  # for Windows
+-            subprocess.call(['taskkill', '/F', '/IM', 'firefox.exe'])
+-        elif os.name == 'posix':  # for Unix-like systems, including macOS
+-            subprocess.call(['killall', 'firefox'])
++        result = None
++        try:
++            if os.name == 'nt':  # for Windows
++                result = subprocess.run(['taskkill', '/F', '/IM', 'firefox.exe'], capture_output=True, text=True)
++            elif os.name == 'posix':  # for Unix-like systems, including macOS
++                result = subprocess.run(['killall', 'firefox'], capture_output=True, text=True)
++        except Exception as e:
++            print(f"Error occurred in closing Firefox processes: {e}")
++
++        if result and "The process \"firefox.exe\" not found" in result.stderr:
++            print("Info: The process \"firefox.exe\" is not found.")
++        elif result and result.stderr:
++            print(f"Error: {result.stderr}")
+ 
+     def sort_csv(self, csv_path):
+         df = pd.read_csv(csv_path)
+-        df_sorted = df.sort_values(by=['Username', 'Test Case'])
++        # Ensure "Login Test" and "exit" are present in the dataframe
++        if "Login Test" in df["Test Case"].values and "exit" in df["Test Case"].values:
++            # Separate the special cases
++            login_test_df = df[df["Test Case"] == "Login Test"]
++            exit_test_df = df[df["Test Case"] == "exit"]
++            rest_df = df[(df["Test Case"] != "Login Test") & (df["Test Case"] != "exit")]
++
++            # Sort the rest of the dataframe
++            rest_df_sorted = rest_df.sort_values(by=['Username', 'Test Case'])
++
++            # Concatenate in the desired order
++            df_sorted = pd.concat([login_test_df, rest_df_sorted, exit_test_df])
++        else:
++            df_sorted = df.sort_values(by=['Username', 'Test Case'])
++
+         df_sorted.to_csv(csv_path, index=False)
+ 
+     def summarize_test_results(self, csv_path):
+@@ -254,21 +277,11 @@
+         for col in ['Average_Response_Time', 'Min_Response_Time', 'Max_Response_Time']:
+             summary[col] = summary[col].round(3)
+ 
+-        # Calculating average loading time for login page
+-        login_test_df = df[df['Test Case'] == 'login test']
+-        avg_loading_time_login_page = login_test_df['Loading Time Login Page'].mean()
+-
+-        # Creating the new row as a DataFrame and concatenating it with the summary
+-        new_row = pd.DataFrame([{'Test Case': 'Average Loading Time Login Page',
+-                                 'Average_Response_Time': round(avg_loading_time_login_page, 3)}])
+-        summary = pd.concat([summary, new_row], ignore_index=True)
+-
+         # Saving the updated summary
+         summary_csv_path = csv_path.replace('.csv', '_summary.csv')
+         summary.to_csv(summary_csv_path, index=False)
+         print(f"Summary has been saved to {summary_csv_path}")
+ 
+-
+ class Main:
+ 
+     def __init__(self):
+@@ -276,7 +289,6 @@
+         self.load_pages = LoadPages(self.login_tests.drivers)
+         self.token_manager = AccessTokenManager()
+ 
+-
+         with open('configuration/test_data1.json', 'r') as f:
+             data = json.load(f)
+             self.test_data = data.get('tests', [])  # Get the 'tests' list
+@@ -379,6 +391,7 @@
+         users_set = set()  # Set to keep track of unique users
+         summarize = Summarize()
+         summarize.close_firefox_processes()
++
+         print(f'******************* Start TESTING ****************************_on lab {host}')
+         print(f'Total Cycles Requested is {number_of_cycles}')
+ 

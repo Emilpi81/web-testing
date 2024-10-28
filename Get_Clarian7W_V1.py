@@ -16,6 +16,7 @@ import os
 import urllib.parse
 import configparser
 import subprocess
+import random
 from requests.exceptions import SSLError
 import customtkinter as ctk
 from tkinter import messagebox
@@ -102,10 +103,8 @@ class LoginTests:
 class LoadPages:
     def __init__(self, drivers):
         self.drivers = drivers
-
     def wait_for_page_load(self, driver):
         WebDriverWait(driver, PAUSE_TIME).until(lambda d: d.execute_script('return document.readyState') == 'complete')
-
     def click_button(self, driver, wait, click, selector):
         start_time = time.time()
         try:
@@ -128,14 +127,10 @@ class LoadPages:
             return True, time.time() - start_time
         except TimeoutException:
             return False, time.time() - start_time
-
     def browse_url(self, driver, url):
         driver.get(url)
-
     def verify_page_content(self, driver, content):
         page_inner_html = driver.execute_script("return document.body.innerHTML")
-        #WebDriverWait(driver, PAUSE_TIME).until(lambda d: d.execute_script('return document.readyState') == 'complete')
-
         if page_inner_html is None:
             print("Warning: Page content is None.")
             return False, "Page content not found"
@@ -147,11 +142,9 @@ class LoadPages:
         if content in page_inner_html:
             return True, ""
         return False, ""
-
 class AccessTokenManager:
     def __init__(self):
         self.access_tokens = {}  # Dictionary to store access tokens
-
     def fetch_and_store_all_tokens(self, credentials_file, writer):
         with open('configuration/user_credentials.csv', 'r') as credentials_file:
             reader = csv.reader(credentials_file)
@@ -160,7 +153,6 @@ class AccessTokenManager:
                     username = row[0].strip()
                     password = row[1].strip()
                     self.fetch_and_store_access_token(username, password, writer)
-
     def fetch_and_store_access_token(self, username, password, writer):
         url = f"{url_link}{api_token}"
         payload = f"username={username}&password={password}&remember_me=N&doCaptchaValidation=null&captcha=undefined&grant_type=password"
@@ -225,7 +217,6 @@ class AccessTokenManager:
             return is_first_word_present, json_response
         else:
             return False, None
-
     def get_events_filter(self, access_token, test_params):
         base_url = f"{url_link}api/analytics"
         params = {
@@ -240,7 +231,6 @@ class AccessTokenManager:
         # Prepare the request details for printing
         prepared_request = requests.Request('GET', base_url, headers=headers,
                                             params={'params': json.dumps(params)}).prepare()
-
         # Send the request
         session = requests.Session()
         response = session.send(prepared_request, verify=False)
@@ -249,8 +239,30 @@ class AccessTokenManager:
             return True, response.json()
         else:
             return False, None
-        #response = requests.get(base_url, headers=headers, params={'params': json.dumps(params)}, verify=False)
-
+    def def_create_entity(self, access_token, url_link, entity_data):
+        # API request setup
+        url = f"{url_link}/api/subject"
+        headers = {
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:122.0) Gecko/20100101 Firefox/122.0",
+            "Accept": "application/json, text/plain, */*",
+            "Accept-Language": "en-US,en;q=0.5",
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {access_token}",
+            "Origin": url_link,
+            "Referer": f"{url_link}entities/add/"
+        }
+        payload = json.dumps(entity_data)
+        # Send POST request
+        response = requests.post(url, headers=headers, data=payload, verify=False)
+        if response.status_code == 200:
+            data = response.json()
+            entity_id = data.get('id')
+            if entity_id is not None:
+                return True, data, entity_id
+            else:
+                return False, response.status_code, "ID not found in response"
+        else:
+            return False, response.status_code, response.text
 class Summarize:
     def close_firefox_processes(self):
         result = None
@@ -323,7 +335,6 @@ class Main:
         for test in self.test_data:
             if "click" in test and "{url_link}" in test["click"]:
                 test["click"] = test["click"].replace("{url_link}", url_link)
-
     def run_page_test(self, writer, driver, wait, username, test_name, click, selector, expected_content):
         try:
             click_result, loading_time = self.load_pages.click_button(driver, wait, click, selector)
@@ -419,12 +430,28 @@ class Main:
                 # 4. Test Execution for "api"
                 for test in self.test_data:
                     if test["type"] == "api":
-                        self.run_api_test(writer, username, test)  # Updated to use the access token
-                        if test["test_name"] == "Federated Search name":
-                            success, response = self.token_manager.get_events_filter(access_token, test["params"])
+                        self.run_api_test(writer, username, test)
                     elif test["type"] == "events_filter":
                         self.run_events_filter_test(writer, username, test, access_token)
+                    elif test["type"] == "create_entity":
+                        # Generate random values
+                        random_number = random.randint(10000, 99999)
+                        random_cpf = f"{random.randint(100, 999)}.{random.randint(100, 999)}.{random.randint(100, 999)}-{random.randint(10, 99)}"
 
+                        # Update entity_data with random values
+                        entity_data = test.get("entity_data", {})
+                        entity_data["name"] = f"Test_{random_number}"
+                        entity_data["cpf"] = random_cpf
+
+                        # Call def_create_entity with updated entity_data
+                        start_time = time.time()
+                        success, response, entity_id = self.token_manager.def_create_entity(access_token, url_link, entity_data)
+                        end_time = time.time()
+                        response_time = end_time - start_time
+                        result = 'Passed' if success else 'Failed'
+                        print(f'{username} Create Entity Test {result}')
+                        writer.writerow(
+                            [username, 'Create Entity Test', result, '', response_time, 'api' if success else 'Failed'])
                 break  # Break the loop if successful
             except (WebDriverException, TimeoutException, NoSuchElementException) as e:
                 print(f'Error occurred during testing for user {username}: {e}')
@@ -436,7 +463,6 @@ class Main:
                 # Ensure the driver is quit after each attempt
                 if 'driver' in locals() and driver:
                     driver.quit()
-
     def run_tests(self):
         global number_of_cycles
         number_of_cycles = int(number_of_cycles)  # Convert to integer

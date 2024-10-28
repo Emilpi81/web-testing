@@ -1,0 +1,238 @@
+{
+  "tests": [
+    {
+      "type": "api",
+      "test_name": "Federated Search name",
+      "endpoint": "api/federated-search",
+      "params": {
+        "filters": {
+          "pageIndex": 1,
+          "pageSize": 15,
+          "searchWords": "john",
+          "operator": "and",
+          "langCode": "enUS"
+        }
+      }
+    },
+    {
+      "type": "api",
+      "test_name": "Federated Search number",
+      "endpoint": "api/federated-search",
+      "params": {
+        "filters": {
+          "pageIndex": 1,
+          "pageSize": 15,
+          "searchWords": "2222222222",
+          "operator": "and",
+          "langCode": "enUS"
+        }
+      }
+    },
+    {
+      "type": "api",
+      "test_name": "two word AND search",
+      "endpoint": "api/federated-search",
+      "params": {
+        "filters": {
+          "pageIndex": 1,
+          "pageSize": 15,
+          "searchWords": "tiago,EBNR",
+          "operator": "and",
+          "langCode": "enUS"
+        }
+      }
+    },
+  {
+      "type": "api",
+      "test_name": "two word OR search",
+      "endpoint": "api/federated-search",
+      "params": {
+        "filters": {
+          "pageIndex": 1,
+          "pageSize": 15,
+          "searchWords": "tiago,john",
+          "operator": "or",
+          "langCode": "enUS"
+        }
+      }
+    },
+{
+  "type": "events_filter",
+  "test_name": "last three years events",
+  "endpoint": "api/analytics",
+  "params": {
+    "filters": {
+      "pageIndex": 1,
+      "pageSize": 15,
+      "typeEvent": "V,S,M,W,E,C,O,L",
+      "columnOrder": "startDate",
+      "typeOrder": "DESC",
+      "startDate": "2021-12-03T00:00:00",
+      "endDate": "2024-01-29T23:59:59",
+      "isEndlessScrolling": false,
+      "participants": null,
+      "targets": null,
+      "groupBy": null,
+      "transcription": null,
+      "keyword": "",
+      "wordWordCloud": null,
+      "advancedReadyQuery": null,
+      "filterDate": null,
+      "subjects": null,
+      "identities": null,
+      "sources": null,
+      "isClassified": null,
+      "ics": null,
+      "cgis": null,
+      "imsi": null,
+      "imei": null,
+      "imsiCountry": null,
+      "imsiOperator": null,
+      "imeiDevice": null,
+      "imeiDeviceVendor": null,
+      "terminalId": null,
+      "mmsi": null,
+      "targetsIds": "964,1097",
+      "investigationsIds": "693",
+      "interceptionSets": "6299,6508,6509,6511",
+      "analyticEvents": true,
+      "analyticTimeBar": false,
+      "analyticMap": false,
+      "analyticTopFiveCarriers": false,
+      "analyticTopFiveInvestigations": false,
+      "analyticTopFiveProtocols": false,
+      "analyticTopFiveMsisdn": false,
+      "analyticTopFiveCategories": false,
+      "analyticWordCloud": false,
+      "analyticRelationshipCommunications": false,
+      "analyticRelationshipDevices": false,
+      "analyticRelationshipSharedContacts": false,
+      "analyticRelationshipPortability": false,
+      "analyticRelationshipProtocols": false,
+      "analyticTracking": false,
+      "fromEvent": false,
+      "events": true
+    }
+  }
+},
+{
+      "type": "page",
+      "test_name": "Analytics Page Test",
+      "click": "/html/body/div[1]/section/aside/div/ul/li[2]/div",
+      "selector": "XPATH",
+      "content": "Analytics"
+    },
+    {
+      "type": "page",
+      "test_name": "Operation Page",
+      "click": "/html/body/div[1]/section/aside/div/ul/li[4]/div",
+      "selector": "XPATH",
+      "content": "IC"
+    },
+    {
+      "type": "page",
+      "test_name": "Entities Page",
+      "click": "{url_link}entities",
+      "selector": "URL",
+      "content": "Entity Type"
+    },
+    {
+      "type": "page",
+      "test_name": "Targets Page",
+      "click": "{url_link}targets",
+      "selector": "URL",
+      "content": "target"
+    },
+    {
+      "type": "page",
+      "test_name": "IC Page",
+      "click": "{url_link}ic",
+      "selector": "URL",
+      "content": "test"
+    },
+   {
+      "type": "page",
+      "test_name": "IC Page, check IC Value",
+      "click": "{url_link}ic",
+      "selector": "URL",
+      "content": "applecloud@apple.com"
+    },
+    {
+      "type": "page",
+      "test_name": "Organization Management Page",
+      "click": "{url_link}organizationManagement",
+      "selector": "URL",
+      "content": "Application Filtering"
+    },
+    {
+      "type": "page",
+      "test_name": "Alerts Page",
+      "click": "/html/body/div[1]/section/section/header/div[2]/div[3]",
+      "selector": "XPATH",
+      "content": "Manage alerts"
+    },
+    {
+      "type": "page",
+      "test_name": "Analytics Map",
+      "click": "{url_link}analytics-map?detached=true",
+      "selector": "URL",
+      "content": "map-cell"
+    },
+    {
+      "type": "page",
+      "test_name": "VLA",
+      "click": "{url_link}analytics-vla?detached=true",
+      "selector": "URL",
+      "content": "8888"
+    },
+    {
+      "type": "page",
+      "test_name": "Manage Alerts Page",
+      "click": "{url_link}alert",
+      "selector": "URL",
+      "content": "Actions"
+    },
+    {
+      "type": "page",
+      "test_name": "False possitive Manage Alerts Page",
+      "click": "{url_link}alert",
+      "selector": "URL",
+      "content": "Napoleon"
+    },
+    {
+      "type": "page",
+      "test_name": "Management Page",
+      "click": "/html/body/div[1]/section/aside/div/ul/li[7]/div/div/span[1]",
+      "selector": "XPATH",
+      "content": "DID"
+    },
+    {
+      "type": "page",
+      "test_name": "import-export Page",
+      "click": "{url_link}import-export",
+      "selector": "URL",
+      "content": "import"
+    },
+    {
+      "type": "page",
+      "test_name": "Location History",
+      "click": "{url_link}location-history",
+      "selector": "URL",
+      "content": "tiago"
+    },
+    {
+      "type": "page",
+      "test_name": "My Informations",
+      "click": "/html/body/div/section/section/header/div[2]/div[5]/span/button/span[2]",
+      "selector": "XPATH",
+      "content": "Exit"
+    },
+    {
+      "type": "page",
+      "test_name": "Exit",
+      "click": "/html/body/div[2]/div/div/ul/li[5]/div/div",
+      "selector": "XPATH",
+      "content": "login"
+    }	
+  ]
+}
