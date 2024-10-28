@@ -1,0 +1,39 @@
+{
+  "tests": [
+    {
+      "type": "api",
+      "test_name": "Federated Search",
+      "endpoint": "api/federated-search",
+      "params": {
+        "filters": {
+          "pageIndex": 1,
+          "pageSize": 15,
+          "searchWords": "tiago",
+          "operator": "and",
+          "langCode": "enUS"
+        }
+      }
+    },
+    {
+      "type": "page",
+      "test_name": "Location History",
+      "click": "{url_link}location-history",
+      "selector": "URL",
+      "content": "tiago"
+    },
+    {
+      "type": "page",
+      "test_name": "My Informations",
+      "click": "/html/body/div/section/section/header/div[2]/div[5]/span/button/span[2]",
+      "selector": "XPATH",
+      "content": "Exit"
+    },
+    {
+      "type": "page",
+      "test_name": "Exit",
+      "click": "/html/body/div[2]/div/div/ul/li[5]/div/div",
+      "selector": "XPATH",
+      "content": "login"
+    }	
+  ]
+}

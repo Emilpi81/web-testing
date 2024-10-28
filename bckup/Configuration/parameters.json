@@ -1,0 +1,19 @@
+{
+    "login_ugs_subsystem": {
+        "type": 276,
+        "id": 56
+    },
+    "sys_user_login": {
+        "regnum": "SYS",
+        "password": "AAAaaa123"
+    },
+    "create_users": {
+        "userName": "Emil1",
+        "parentFolderId": 6501,
+        "userType": 4,
+        "userMode": 0,
+        "userRole": 3,
+        "isActive": true,
+        "comments": "Emil's Script"
+    }
+}
